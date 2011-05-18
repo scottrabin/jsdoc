@@ -1,4 +1,4 @@
 #!/bin/sh
 
 BASEDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
-java -classpath $BASEDIR/js.jar org.mozilla.javascript.tools.shell.Main $BASEDIR/jsdoc.js $@
+java -jar $BASEDIR/js.jar -modules org.mozilla.javascript.commonjs.module $BASEDIR/jsdoc.js $@

@@ -6,7 +6,7 @@
  */
 (function() {
 	var common = {
-		args: require('common/args')
+		args: require('args')
 	};
 	
 	var argParser = new common.args.ArgParser(),

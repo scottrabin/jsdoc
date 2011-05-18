@@ -14,57 +14,7 @@
  */
 const BASEDIR = './';
 
-/** Include a JavaScript module, defined in the CommonJS way.
-    @param {string} id The identifier of the module you require.
-    @returns {mixed} The module's "exports" value.
-    @see <http://wiki.commonjs.org/wiki/Modules/1.1>
- */
-function require(id) { // like commonjs
-    var moduleContent = '',
-        moduleUri;
-    
-    for (var i = 0, len = require.paths.length; i < len; i++) {
-        moduleUri = require.paths[i] + '/' + id + '.js';
-        moduleContent = '';
-        
-        var file = new java.io.File(moduleUri);
-        if ( file.exists() && file.canRead() && !file.isDirectory() ) {
-            try {    
-                var scanner = new java.util.Scanner(file).useDelimiter("\\Z");
-                moduleContent = String( scanner.next() );
-            }
-            catch(ignored) { }
-            
-            if (moduleContent) { break; }
-        }
-    }
-    
-    if (moduleContent) {
-            try {
-                var f = new Function('require', 'exports', 'module', moduleContent),
-                exports = require.cache[moduleUri] || {},
-                module = { id: id, uri: moduleUri };
-    
-            
-                f.call({}, require, exports, module);
-            }
-            catch(e) {
-                throw 'Unable to require source code from "' + moduleUri + '": ' + e.toSource();
-            }
-            
-            exports = module.exports || exports;
-            require.cache[id] = exports;
-    }
-    else {
-        throw 'The requested module cannot be returned: no content for id: "' + id + '" in paths: ' + require.paths.join(', ');
-    }
-    
-    return exports;
-}
-require.root = BASEDIR;
-require.paths = [ require.root + 'modules', require.root + 'modules/common' ];
-require.cache = {}; // cache module exports. Like: {id: exported}
-
+require.paths.push( "modules" );
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
@@ -105,30 +55,15 @@ env = {
     @namespace
 */
 app = {
+    common: {
+	fs: require('common/fs')
+    },
     jsdoc: {
         scanner: new (require('jsdoc/src/scanner').Scanner)(),
         parser: new (require('jsdoc/src/parser').Parser)(),
         name: require('jsdoc/name')
     }
-}
-
-try { main(); }
-catch(e) { 
-     if (e.rhinoException != null) { 
-         e.rhinoException.printStackTrace();
-     }
-     else throw e;
-} 
-finally { env.run.finish = new Date(); }
-
-/** Print string/s out to the console.
-    @param {string} ... String/s to print out to console.
- */
-function print() {
-    for (var i = 0, leni = arguments.length; i < leni; i++) {
-        java.lang.System.out.println('' + arguments[i]);
-    }
-}
+};
 
 /**
     Try to recursively print out all key/values in an object.
@@ -167,7 +102,7 @@ function exit(n) {
 
 
 /**
-    Run the jsoc application.
+    Run the jsdoc application.
  */
 function main() {
     var sourceFiles,
@@ -175,7 +110,7 @@ function main() {
         docs,
         jsdoc = {
             opts: {
-                parser: require('jsdoc/opts/parser'),
+                parser: require('jsdoc/opts/parser')
             }
         };
     
@@ -183,7 +118,7 @@ function main() {
     
     try {
         env.conf = JSON.parse(
-            require('fs').read( env.opts.configure || BASEDIR+'conf.json' )
+            app.common.fs.read( env.opts.configure || BASEDIR+'conf.json' )
         );
     }
     catch (e) {
@@ -271,3 +206,12 @@ function main() {
         }
     }
 }
+
+try { main(); }
+catch(e) { 
+     if (e.rhinoException != null) { 
+         e.rhinoException.printStackTrace();
+     }
+     else throw e;
+} 
+finally { env.run.finish = new Date(); }

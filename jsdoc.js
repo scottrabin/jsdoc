@@ -12,9 +12,9 @@
     @type string
     @global
  */
-const BASEDIR = './';
+const BASEDIR = new String(java.lang.System.getProperty("java.class.path")).replace( /[^\/]+$/, "");
 
-require.paths.push( "modules" );
+require.paths.push( BASEDIR + "modules", BASEDIR + "modules/common" );
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 

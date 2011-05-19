@@ -287,4 +287,5 @@
         }
     }
     
+     if( typeof exports !== 'undefined' ){ exports.publish = publish; }
 })();

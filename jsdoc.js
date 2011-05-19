@@ -14,7 +14,7 @@
  */
 const BASEDIR = new String(java.lang.System.getProperty("java.class.path")).replace( /[^\/]+$/, "");
 
-require.paths.push( BASEDIR + "modules", BASEDIR + "modules/common" );
+require.paths.push( BASEDIR + "modules", BASEDIR + "modules/common", BASEDIR + "templates" );
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
@@ -194,7 +194,8 @@ function main() {
         env.opts.template = env.opts.template || 'default';
         
         // should define a global "publish" function
-        include('templates/' + env.opts.template + '/publish.js');
+//        include('templates/' + env.opts.template + '/publish.js');
+	var publish = require( env.opts.template + '/publish' ).publish;
 
         if (typeof publish === 'function') {
             publish(
